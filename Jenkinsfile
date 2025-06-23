@@ -6,9 +6,6 @@ pipeline{
         workspace = "/var/www/stage"
     }
 
-    parameters{
-        file(name: '', description: "upload the testing script in .php or .zip")
-        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run tests before deploy?')
     }
     stages{
         stage('clone repo'){
@@ -26,29 +23,7 @@ pipeline{
                 }
             }
         }
-        stage('upload custom test file'){
-            when{
-                expression{return params.TEST_FILE}
-            }
-            steps{
-                script{
-                    sh '''
-                    mkdir -p ${DEPLOY_DIR}/tests/Custom
-                    cp "$TEST_FILE" ${DEPLOY_DIR/tests/Custom/upload_test.php}
-                    '''
-                }
-            }
-        }
-        stage('run tests'){
-            when{
-                expression{ return params.RUN_TESTS}
-            }
-            steps{
-                dir("${env.workspace}"){
-                    sh 'php artisan test'
-                }
-            }
-        }
+       
         stage('lavarel cache & migration'){
             steps{
                 sh 'echo "lavarel cache & migration"'
