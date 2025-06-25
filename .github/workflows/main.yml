@@ -1,0 +1,40 @@
+name: Manual Deploy to Staging or Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options: 
+          - staging
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_PATH: ${{ inputs.environment == 'production' && '/var/www/production/hawkduty.com' || '/var/www/staging/oncall'}}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with: 
+        host: ${{ inputs.environment == 'production' && secrets.PROD_HOST || secrets.STAGING_HOST}}
+        username: ${{inputs.environment == 'production' && secrests.PROD_USER || secrets.STAGING_USER}}
+        key: ${{  inputs.environment == 'production' && secrets.PROD_SSH_KEY || secrets.STAGING_SSH_KEY}}
+        script: |
+          cd ${{  env.PROJECT_PATH  }}
+          git pull origin main
+          composer install --no-dev
+          cd backend
+          npm install
+          npm run prod 
+          php artisan tenants:migrate
+          sudo systemctl restart php8.2-fpm.service 
