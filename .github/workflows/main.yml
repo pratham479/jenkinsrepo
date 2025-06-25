@@ -27,7 +27,7 @@ jobs:
       uses: appleboy/ssh-action@v1.0.3
       with: 
         host: ${{ inputs.environment == 'production' && secrets.PROD_HOST || secrets.STAGING_HOST}}
-        username: ${{inputs.environment == 'production' && secrests.PROD_USER || secrets.STAGING_USER}}
+        username: ${{inputs.environment == 'production' && secrets.PROD_USER || secrets.STAGING_USER}}
         key: ${{  inputs.environment == 'production' && secrets.PROD_SSH_KEY || secrets.STAGING_SSH_KEY}}
         script: |
           cd ${{  env.PROJECT_PATH  }}
