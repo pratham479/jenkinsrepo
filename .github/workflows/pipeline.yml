@@ -1,4 +1,4 @@
-name: Manual Deploy to Staging or Production
+name: Hawkduty Deploy to Staging or Production
 
 on:
   workflow_dispatch:
