@@ -20,8 +20,9 @@ jobs:
     steps:
     - name: select deploy directory
       id: set-dir
+      env:
+        ENVIRONMENT: ${{ github.event.inputs.environment }}
       run: |
-        ENVIRONMENT=${{ github.event.inputs.environment }}
         if [ "$ENVIRONMENT" = "production"]; then
           echo "dir=/var/www/production/hawkduty.com" >> $GITHUB_OUTPUT
         else
