@@ -24,10 +24,11 @@ jobs:
         ENVIRONMENT: ${{ github.event.inputs.environment }}
       run: |
         if [ "$ENVIRONMENT" = "production"]; then
-          echo "dir=/var/www/production/hawkduty.com" >> $GITHUB_OUTPUT
+          echo "dir=/var/www/production/hawkduty.com" >> "$GITHUB_OUTPUT"
         else
-          echo "dir=/var/www/stage/oncall.elevatitech.com" >> $GITHUB_OUTPUT
+          echo "dir=/var/www/stage/oncall.elevatitech.com" >> "$GITHUB_OUTPUT"
         fi
+      shell: bash
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with: 
