@@ -23,7 +23,7 @@ jobs:
       env:
         ENVIRONMENT: ${{ github.event.inputs.environment }}
       run: |
-        if [ "$ENVIRONMENT" = "production"]; then
+        if [ "$ENVIRONMENT" = "production" ]; then
           echo "dir=/var/www/production/hawkduty.com" >> "$GITHUB_OUTPUT"
         else
           echo "dir=/var/www/stage/oncall.elevatitech.com" >> "$GITHUB_OUTPUT"
