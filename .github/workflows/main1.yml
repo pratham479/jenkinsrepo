@@ -1,41 +1,43 @@
-name: Deploy to Environment 
+name: Manual Deploy to Staging or Production
 
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy (staging or production)'
+        description: 'Choose Deployment environment'
         required: true
         default: 'staging'
         type: choice
-        options:
-        - staging
-        - production
+        options: 
+          - staging
+          - production
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    env:
-      PROJECT_PATH: ${{ inputs.environment == 'production' && '/var/www/production/hawkduty.com' || '/var/www/stage/oncall.elevatitech.com' }}
+    name: Deploy to ${{ github.event.inputs.environment }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: select deploy directory
+      id: set-dir
+      run: |
+        if [ "${{ github.event.inputs.environment }}" = "production"]; then
+          echo "dir=/var/www/production/hawkduty.com" >> $GITHUB_OUTPUT
+        else
+          echo "dir=/var/www/stage/oncall.elevatitech.com" >> $GITHUB_OUTPUT
 
-    - name: Deploy via SSH to ${{ inputs.environment }}
+    - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
-      with:
+      with: 
         host: ${{ secrets.DEPLOY_HOST }}
         username: ${{ secrets.DEPLOY_USER }}
         key: ${{ secrets.DEPLOY_SSH_KEY }}
         script: |
-          echo "Deploying to ${{ inputs.environment }} at ${{ env.PROJECT_PATH }}"
-          cd ${{ env.PROJECT_PATH }}
+          cd ${{  steps.set-dir.outputs.dir  }}
           git pull origin main
           composer install --no-dev
           cd backend
           npm install
-          npm run prod
+          npm run prod 
           php artisan tenants:migrate
-          sudo systemctl restart php8.2-fpm.service
+          sudo systemctl restart php8.2-fpm.service 
