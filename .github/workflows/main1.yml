@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_PATH: ${{ inputs.environment == 'production' && '/var/www/production/hawkduty.com' || '/var/www/staging/hawkduty.com' }}
+      PROJECT_PATH: ${{ inputs.environment == 'production' && '/var/www/production/hawkduty.com' || '/var/www/stage/oncall.elevatitech.com' }}
 
     steps:
     - name: Checkout code
