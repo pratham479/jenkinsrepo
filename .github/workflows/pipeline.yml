@@ -25,7 +25,7 @@ jobs:
           echo "dir=/var/www/production/hawkduty.com" >> $GITHUB_OUTPUT
         else
           echo "dir=/var/www/stage/oncall.elevatitech.com" >> $GITHUB_OUTPUT
-
+        fi
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with: 
