@@ -1,46 +1,41 @@
-name: Hawkduty Deploy to Staging or Production
-
+name: Deploy Hawkduty
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Choose Deployment environment'
+        description: 'Deployment target environment'
         required: true
-        default: 'staging'
+        default: stage
         type: choice
-        options: 
-          - staging
+        options:
+          - stage
           - production
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy to ${{ github.event.inputs.environment }}
-
     steps:
-    - name: select deploy directory
-      id: set-dir
-      env:
-        ENVIRONMENT: ${{ github.event.inputs.environment }}
+    - name: Set up variables
+      id: vars
       run: |
-        if [ "$ENVIRONMENT" = "production" ]; then
+        if [ "${{ github.event.inputs.environment }}" = "production" ]; then
           echo "dir=/var/www/production/hawkduty.com" >> "$GITHUB_OUTPUT"
+          echo "branch=main" >> "$GITHUB_OUTPUT"
         else
           echo "dir=/var/www/stage/oncall.elevatitech.com" >> "$GITHUB_OUTPUT"
+          echo "branch=development" >> "$GITHUB_OUTPUT"
         fi
-      shell: bash
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
-      with: 
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.DEPLOY_SSH_KEY }}
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: deployer
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
         script: |
-          cd ${{  steps.set-dir.outputs.dir  }}
-          git pull origin main
+          cd ${{ steps.vars.outputs.dir }}
+          git pull origin ${{ steps.vars.outputs.branch }}
           composer install --no-dev
-          cd backend
           npm install
-          npm run prod 
+          npm run build
+          sudo systemctl restart php8.2-fpm
           php artisan tenants:migrate
-          sudo systemctl restart php8.2-fpm.service 
