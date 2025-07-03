@@ -3,7 +3,7 @@ pipeline{
     agent any
     environment{
         workspace = "/var/www/stage"
-    }
+    };
 
     }
     stages{
