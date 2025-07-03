@@ -1,0 +1,26 @@
+name: Run Tests on development branch
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  run-tests:
+    runs-on: ubuntu:latest
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: setup php
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring,
+
+    - name: composer-install
+      run: composer install --no-interaction --prefer-dist
+
+    - name: run tests
+      run: php artisan test --tests-path=/backend/tests
