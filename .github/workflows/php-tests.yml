@@ -17,10 +17,10 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        extensions: mbstring,
+        extensions: ''
 
     - name: composer-install
-      run: composer install --no-interaction --prefer-dist
+      run: composer install --no-interaction --no-dev
 
     - name: run tests
       run: php artisan test --tests-path=/backend/tests
